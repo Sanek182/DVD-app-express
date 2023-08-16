@@ -1,0 +1,7 @@
+Name: Send Message to Admin
+HTTP Method: POST
+URL: /api/chat/send
+Body: { userId, message }
+Returned data:
+Success: { message: "Message sent.", chat }
+Failure: { error: "Message not sent." }

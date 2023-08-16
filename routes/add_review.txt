@@ -1,0 +1,15 @@
+Name: Add Review
+HTTP Method: POST
+URL: /product/:id/review
+    Query Params: None
+    Path Params:
+        id: The unique identifier for the product/DVD for which the review is being added.
+If it's a POST - the body:
+    Rating (User's own rating for the product)
+    Review Text
+Returned data:
+    In case of success:
+        Confirmation message
+        Review object (including the user's rating and review text)
+    In case of failure:
+        An error message and code.

@@ -1,0 +1,21 @@
+Name: Get Latest Products for Main Page
+HTTP Method: GET
+URL: /api/latest-products
+    Query Params: None
+    Path Params: None
+Returned data:
+Success: {
+    "products": [
+        {
+        "id": 1,
+        "title": "Movie Title",
+        "year": 1990,
+        "genre": "Surreal",
+        "country": "Ukraine",
+        "rating": 9.0,
+        "image": "image-url"
+        },
+        // Other 6-10 dvds
+    ]
+}
+Failure: { error: "Failed to retrieve products." }

@@ -1,0 +1,11 @@
+Name: Login User
+HTTP Method: POST
+URL: /auth/login
+    Query Params: None
+    Path Params: None
+Body:
+    email: String
+    password: String
+Returned Data:
+    Success: "Welcome! You are now logged in."
+    Failure: "Invalid email or password."

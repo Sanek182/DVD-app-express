@@ -1,0 +1,7 @@
+Name: Add to Cart
+HTTP Method: POST
+URL: /api/cart/add
+Body: { userId, productId, quantity }
+Returned data:
+Success: { message: "Added to cart.", cart }
+Failure: { error: "Failed to add to cart." }

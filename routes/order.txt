@@ -1,0 +1,7 @@
+Name: Checkout
+HTTP Method: POST
+URL: /api/cart/checkout
+Body: { userId, shippingAddress, paymentMethod }
+Returned data:
+Success: { message: "Checkout successful.", order }
+Failure: { error: "Checkout failed." }

@@ -1,0 +1,17 @@
+Name: Get Product by ID
+HTTP Method: GET
+URL: /api/product/:id
+Path Params: 'unique id'
+Returned data:
+Success: { "product": [
+        {
+        "title": "Movie Title",
+        "year": 1990,
+        "genre": "Surreal",
+        "country": "Ukraine",
+        "rating": 9.0,
+        "image": "image-url",
+        "tags": "oldschool", "adventure", ...
+        "reviews": "What a movie!"
+        }, }
+Failure: { error: "DVD not found." }

@@ -1,0 +1,21 @@
+Name: Register User
+HTTP Method: POST
+URL: /auth/register
+    Query Params: None
+    Path Params: None
+Body:
+    username: String
+    email: String (Should be unique and valid)
+    password: String
+    confirmPassword: String
+Returned Data:
+    Success: 
+        - "Congratulations! Your registration is successful."
+        - token for authentication?
+    Failure: 
+        - "Something went wrong. Registration failed."
+        - "Passwords do not match" 
+        - "Email is already taken"
+        - "Create a proper password"
+        - "All fields must be filled"
+        - ...

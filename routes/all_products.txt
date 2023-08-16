@@ -1,0 +1,27 @@
+Name: Get All Products
+HTTP Method: GET
+URL: /api/products
+    Query Params: 
+        ?genre='genre' (to filter by genre)
+        ?country='country_name' (to filter by country)
+        ?decade='years' (to filter by decade)
+        ?sortBy='rating' (to sort by rating)
+        ?sortBy='year' (to sort by year)
+        ?page=1&limit=10 (for pagination)
+    Path Params: None
+Returned data:
+Success: {
+    "products": [
+        {
+        "id": 1,
+        "title": "Movie Title",
+        "year": 1990,
+        "genre": "Surreal",
+        "country": "Ukraine",
+        "rating": 9.0,
+        "image": "image-url"
+        },
+        // Other dvds according to filter/sorting criteria
+    ]
+}
+Failure: { error: "Failed to retrieve dvds." }
