@@ -1,0 +1,18 @@
+Name: Update or Complement User Registration
+HTTP Method: PUT
+URL: /auth/user/:id/register-info
+    Query Params: None
+    Path Params: None
+Body:
+    name: Full name
+    surname: Surname
+    phoneNumber: Phone number
+    Country of residence
+    specificDetails: Additional specific details if needed (shipping instructions, ...)
+Returned Data:
+    Success: 
+        - "Congratulations! Checkout information updated successfully."
+    Failure: 
+        - "Something went wrong. Registration failed."
+        - "All fields must be filled"
+        - ...

@@ -1,0 +1,10 @@
+Name: See Messages for separate User
+HTTP Method: GET
+URL: /admin/users/:id/messages
+    Query Params: None
+    Path Params: user id
+Returned data:
+    Success:
+        Admin gets one chosen user Messages (unread)
+    Failure:
+        Error message.

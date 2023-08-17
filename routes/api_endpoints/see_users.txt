@@ -1,0 +1,15 @@
+Name: See all Users
+HTTP Method: GET
+URL: /admin/users
+    Headers: Authorization: Bearer <admin_token>
+Returned Data:
+    Success:
+        List of users with name, 
+        email, 
+        country, 
+        purchased movie titles, 
+        sum spent, 
+        wishlist items, 
+        unread messages, 
+        unapproved reviews.
+    Failure: Error message

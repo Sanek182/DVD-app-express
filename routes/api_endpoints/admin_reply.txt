@@ -1,0 +1,10 @@
+Name: Reply to a chosen Message
+HTTP Method: POST
+URL: /admin/messages/:messageID/reply
+    Query Params: None
+    Path Params: user id; message id.
+Returned data:
+    Success:
+        "Message sent", message content.
+    Failure:
+        Error message.

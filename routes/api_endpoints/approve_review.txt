@@ -1,0 +1,17 @@
+Name: Approve Review
+HTTP Method: PUT
+URL: /admin/review/:reviewId/approve
+Headers:
+    Authorization: Bearer <admin_token>
+Returned Data:
+    Success: "Review approved."
+    Failure: Error message
+
+## Or admin can not approve review:
+
+HTTP Method: DELETE
+URL: /admin/review/:reviewId/disapprove
+
+Returned Data:
+    Success: "Review disapproved."
+    Failure: Error message

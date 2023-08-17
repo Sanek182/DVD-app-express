@@ -1,0 +1,10 @@
+Name: Search Movies
+HTTP Method: GET
+URL: /search
+Query Params:
+    query: The search term entered by the user
+Returned Data:
+    Success:
+        List of matching movies with details like title, year, genre, etc.
+    Failure:
+        Error message

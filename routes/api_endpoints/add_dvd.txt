@@ -1,0 +1,17 @@
+Name: Create New DVD
+HTTP Method: POST
+URL: /admin/dvd
+Headers:
+    Authorization: Bearer <admin_token>
+    Request Body:
+        title: DVD title
+        type: DVD type
+        year: Release year
+        quantity: Available quantity
+        genres: Array of genres
+        country: Country of origin
+        tags: Array of tags
+        price: Price for the DVD
+Returned Data:
+    Success: Newly created DVD details
+    Failure: Error message

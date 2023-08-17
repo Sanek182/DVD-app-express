@@ -1,0 +1,18 @@
+Name: Get Order Details
+HTTP Method: GET
+URL: /order
+    Query Params: None
+    Path Params: None
+Returned data: 
+    Success:
+        List of cart items: product icon, 
+        title, 
+        DVD type, 
+        stock status, 
+        quantity, 
+        price for each item, 
+        additional expenses,
+        available for shipping,
+        and total price.
+    Failure:
+        "Something went wrong. Please try again later."

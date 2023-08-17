@@ -1,0 +1,8 @@
+Name: Send Message to Admin
+HTTP Method: POST
+URL: /api/user/messages
+    Query Params: None
+    Path Params: user id, message content and message subject. 
+Returned data:
+    Success: { message: "Message sent.", store in db }
+    Failure: { error: "Message not sent." }

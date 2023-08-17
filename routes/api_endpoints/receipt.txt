@@ -1,0 +1,17 @@
+Name: Get Receipt
+HTTP Method: GET
+URL: /order/receipt/:orderId
+Query Params: None
+Path Params:
+    orderId: The unique identifier of the confirmed order
+Returned Data:
+    Success:
+        Receipt details: 
+            username, 
+            country of residence, 
+            order details (similar to those described in the user's personal cabinet), 
+            order number, 
+            date of purchase, 
+            total cost, etc.
+    Failure:
+        "Something went wrong. Please try again later."
