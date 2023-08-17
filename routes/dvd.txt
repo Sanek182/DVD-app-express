@@ -3,7 +3,7 @@ HTTP Method: GET
 URL: /api/product/:id
 Path Params: 'unique id'
 Returned data:
-Success: { "product": [
+Success: { "product":
         {
         "title": "Movie Title",
         "year": 1990,

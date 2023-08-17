@@ -1,0 +1,10 @@
+Name: Update Quantity
+HTTP Method: PATCH
+URL: /cart/add/:id
+    Query Params: None
+    Path Params: id
+    Body:
+        Quantity (New quantity for the product, e.g., a number between 1 and 10)
+Returned data:
+    Success: Updated cart item details.
+    Failure: Error message.

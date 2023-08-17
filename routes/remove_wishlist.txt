@@ -1,0 +1,8 @@
+Name: Remove from Wishlist
+HTTP Method: DELETE
+URL: /wishlist/:id/remove
+    Query Params: None
+    Path Params: id:
+Returned data:
+    Success: Confirmation message.
+    Failure: Error message.

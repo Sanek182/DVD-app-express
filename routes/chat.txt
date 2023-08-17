@@ -1,7 +1,8 @@
 Name: Send Message to Admin
-HTTP Method: POST
-URL: /api/chat/send
-Body: { userId, message }
+HTTP Method: POST (GET to retrieve message)
+URL: /api/user/chat (/api/user/chat/send)
+    Query Params: None
+    Path Params: None 
 Returned data:
-Success: { message: "Message sent.", chat }
-Failure: { error: "Message not sent." }
+    Success: { message: "Message sent.", chat }
+    Failure: { error: "Message not sent." }
