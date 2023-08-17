@@ -1,0 +1,10 @@
+Name: See all personal Messages
+HTTP Method: GET
+URL: /user/cabinet/:id/messages
+    Query Params: None
+    Path Params: id
+Returned data:
+    Success:
+        Messages (unread)
+    Failure:
+        Error message.

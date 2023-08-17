@@ -1,0 +1,8 @@
+Name: Get FAQ
+HTTP Method: GET
+URL: /faq
+Returned Data:
+    Success:
+        List of questions and answers
+    Failure:
+        Error message

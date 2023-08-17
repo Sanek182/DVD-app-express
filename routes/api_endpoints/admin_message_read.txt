@@ -1,0 +1,10 @@
+Name: Mark message as read to highlight in admin's cabinet.
+HTTP Method: GET
+URL: /admin/messages/:messageID
+    Query Params: None
+    Path Params: message id;
+Returned data:
+    Success:
+        Message status changes from 'unread' to 'read'.
+    Failure:
+        Error message.

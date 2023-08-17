@@ -1,0 +1,12 @@
+Name: Mainly to see unapproved Reviews
+HTTP Method: GET
+URL: /admin/reviews/unapproved
+    Headers:
+        Authorization: Bearer <admin_token>
+Returned Data:
+    Success:
+        List of unapproved reviews with user name, 
+        email, 
+        movie title, 
+        review text
+    Failure: Error message

@@ -1,7 +1,7 @@
-Name: Checkout
+Name: Make Checkout
 HTTP Method: POST
-URL: /api/cart/checkout
-Body: { userId, shippingAddress, paymentMethod }
+URL: /api/order/checkout
+Body: { userId, shippingAddress, shipping dates... }
 Returned data:
 Success: { message: "Checkout successful.", order }
 Failure: { error: "Checkout failed." }
