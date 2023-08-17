@@ -1,0 +1,13 @@
+Name: User Cabinet
+HTTP Method: GET
+URL: /user/cabinet
+    Query Params: None
+    Path Params: None (authentication token can be used to identify the user)
+Returned data:
+    Success:
+        User details (username, phone number, email, country of residence, etc.)
+        Unread messages
+        Previous orders
+        Wishlist items (including movie titles, quantities, and prices)
+    Failure:
+        Error message.

@@ -1,0 +1,10 @@
+Name: Add to Cart
+HTTP Method: POST
+URL: /products/:id/add-to-cart,
+    /product/:id/add-to-cart,
+    /latest-products/:id/add-to-cart
+    Query Params: None
+    Path Params: id
+Returned data:
+    Success: "Added to cart."
+    Failure: "Failed to add to cart."

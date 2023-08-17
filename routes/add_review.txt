@@ -12,4 +12,5 @@ Returned data:
         Confirmation message
         Review object (including the user's rating and review text)
     In case of failure:
-        An error message and code.
+        "Oops. The product does not exist yet."
+        "Only logged in user can leave review or rate a product. Please log in."

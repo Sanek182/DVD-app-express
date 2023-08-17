@@ -1,0 +1,8 @@
+Name: Remove Item
+HTTP Method: DELETE
+URL: /cart/add/:id
+    Query Params: None
+    Path Params: id:
+Returned data:
+    Success: Confirmation message.
+    Failure: Error message.

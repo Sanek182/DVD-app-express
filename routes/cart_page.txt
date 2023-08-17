@@ -1,0 +1,10 @@
+Name: Get Cart Items
+HTTP Method: GET
+URL: /cart
+    Query Params: None
+    Path Params: None
+Returned data: 
+    Success:
+        List of cart items: product icon, title, DVD type, stock status, quantity, price for each item, and total price.
+    Failure:
+        "Something went wrong. Please try again later."
