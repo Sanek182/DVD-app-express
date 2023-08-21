@@ -6,7 +6,7 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await db.query('SELECT * FROM user WHERE username = ? AND password = ?', [username, password]);
+    const [rows] = await db.query('SELECT * FROM User WHERE username = ? AND password = ?', [username, password]);
 
     if (rows.length === 0) {
       return res.status(401).json({ success: false, message: 'No user found or invalid password' });
