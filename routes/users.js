@@ -1,6 +1,11 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
+const authenticateToken = require('./cookieValidation')
+
+function generateToken() {
+  return require('crypto').randomBytes(48).toString('hex');
+}
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -11,6 +16,16 @@ router.post('/login', async (req, res) => {
     if (rows.length === 0) {
       return res.status(401).json({ success: false, message: "Such user does not exist. Please check your username or password inputs once again."});
     }
+
+    const user = rows[0];
+    const token = generateToken(user.id);
+
+    const expiresIn = 1 * 60 * 60 * 1000;
+    const expiresAt = new Date(Date.now() + expiresIn);
+
+    await db.query('INSERT INTO UserTokens (user_id, token, expires_at) VALUES (?, ?, ?)', [user.id, token, expiresAt]);
+
+    res.cookie('token', token, { httpOnly: true, expires: expiresAt });
 
     res.json({ success: true, message: 'You have successfully logged in!' });
 
