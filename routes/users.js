@@ -9,10 +9,10 @@ router.post('/login', async (req, res) => {
     const [rows] = await db.query('SELECT * FROM User WHERE username = ? AND password = ?', [username, password]);
 
     if (rows.length === 0) {
-      return res.status(401).json({ success: false, message: 'No user found or invalid password' });
+      return res.status(401).json({ success: false, message: "Such user does not exist. Please check your username or password inputs once again."});
     }
 
-    res.json({ success: true, message: 'Login successful!' });
+    res.json({ success: true, message: 'You have successfully logged in!' });
 
   } catch (err) {
     console.error(err);
@@ -21,17 +21,15 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  const { username, email, password, confirmPassword } = req.body;
-
-  if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
+  const { username, email, password } = req.body;
 
   try {
     const [existingEmails] = await db.query('SELECT * FROM User WHERE email = ?', [email]);
-    if (existingEmails.length > 0) return res.status(400).json({ message: 'Email is already taken' });
+    if (existingEmails.length > 0) return res.status(400).json({ success: false, message: 'Email is already taken' });
 
     await db.query('INSERT INTO User (username, email, password) VALUES (?, ?, ?)', [username, email, password]);
 
-    res.json({ message: 'Congratulations! Your registration is successful.' });
+    res.json({ success:true, message: 'Congratulations! Your registration is successful.' });
   } catch (err) {
     console.error(err);
     res.status(500).send('Something went wrong. Registration failed.');
