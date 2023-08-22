@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
 
-router.post('/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -20,7 +20,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res) => {
+router.post('/auth/register', async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
