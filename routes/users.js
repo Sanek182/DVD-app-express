@@ -21,7 +21,7 @@ router.post('/reset-password-request', async (req, res) => {
     await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, ?)', [user.id, token, expiresAt, "reset"]);
 
     const transporter = nodemailer.createTransport({
-      host: 'smtp.mailtrap.io',
+      host: 'sandbox.smtp.mailtrap.io',
       port: 2525,
       auth: {
         user: 'acdff20838ad81',
