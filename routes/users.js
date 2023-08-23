@@ -11,7 +11,7 @@ router.post('/reset-password-request', async (req, res) => {
     const [users] = await db.query('SELECT * FROM User WHERE email = ?', [email]);
 
     if (users.length === 0) {
-      return res.json({ success: true, message: 'If the email exists in our system, a reset link has been sent.' });
+      return res.json({ success: true, message: 'If the email exists in our system, a reset link will be sent.' });
     }
 
     const user = users[0];
@@ -33,7 +33,7 @@ router.post('/reset-password-request', async (req, res) => {
       to: email,
       from: 'noreply@alexstore.com',
       subject: 'Password Reset',
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\nhttp://localhost:3000/auth/reset-password/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      text: `Hi! You got this letter because you want to reset the password for your account.\n\nPlease paste this link into your browser to complete the password change process:\n\nhttp://localhost:3000/auth/reset-password/${token}\n\`,
     };
 
     transporter.sendMail(mailOptions, (err) => {
