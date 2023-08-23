@@ -1,3 +1,5 @@
+const db = require('../database/connection');
+
 async function authenticateToken(req, res, next) {
     const token = req.cookies.token;
   
@@ -21,4 +23,6 @@ async function authenticateToken(req, res, next) {
       res.status(500).send('An error occurred');
     }
   }
+
+  module.exports = { authenticateToken };
   

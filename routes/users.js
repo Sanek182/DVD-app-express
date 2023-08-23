@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
-const authenticateToken = require('./cookieValidation')
 const { generateToken } = require('./token');
 
 router.post('/reset-password-request', async (req, res) => {
@@ -15,12 +14,10 @@ router.post('/reset-password-request', async (req, res) => {
     }
 
     const user = users[0];
-    const token = generateToken();
+    
+    const { token, expiresAt } = generateToken("reset");
 
-    const expiresIn = 1 * 60 * 60 * 1000;
-    const expiresAt = new Date(Date.now() + expiresIn);
-
-    await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, "reset")', [user.id, token, expiresAt]);
+    await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, ?)', [user.id, token, expiresAt, "reset"]);
 
     // Send email with the reset link containing the token (you'll need to implement this function)
     sendResetEmail(email, token);
@@ -66,12 +63,10 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
-    const token = generateToken(user.id);
+    
+    const { token, expiresAt } = generateToken("auth");
 
-    const expiresIn = 1 * 60 * 60 * 1000;
-    const expiresAt = new Date(Date.now() + expiresIn);
-
-    await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, "auth")', [user.id, token, expiresAt]);
+    await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, ?)', [user.id, token, expiresAt, "auth"]);
 
     res.cookie('token', token, { httpOnly: true, expires: expiresAt });
 
