@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
 const authenticateToken = require('./cookieValidation')
-const { generateToken } = require('../token');
+const { generateToken } = require('./token');
 
 router.post('/reset-password-request', async (req, res) => {
   const { email } = req.body;
