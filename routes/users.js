@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
 const { generateToken } = require('./token');
+const nodemailer = require('nodemailer');
 
 router.post('/reset-password-request', async (req, res) => {
   const { email } = req.body;
@@ -19,10 +20,29 @@ router.post('/reset-password-request', async (req, res) => {
 
     await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, ?)', [user.id, token, expiresAt, "reset"]);
 
-    // Send email with the reset link containing the token (you'll need to implement this function)
-    sendResetEmail(email, token);
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: 'acdff20838ad81',
+        pass: '64753571fce73c',
+      },
+    });
 
-    res.json({ success: true, message: 'If the email exists in our system, a reset link has been sent.' });
+    const mailOptions = {
+      to: email,
+      from: 'noreply@alexstore.com',
+      subject: 'Password Reset',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\nhttp://localhost:3000/auth/reset-password/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Email could not be sent.');
+      }
+      res.json({ message: 'Reset password link has been sent to your email address.' });
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -42,7 +62,7 @@ router.post('/reset-password', async (req, res) => {
     const userToken = rows[0];
 
     await db.query('UPDATE User SET password = ? WHERE id = ?', [newPassword, userToken.user_id]);
-    await db.query('DELETE FROM PasswordResetTokens WHERE token = ?', [token]);
+    await db.query('DELETE FROM UserTokens WHERE token = ?', [token]);
 
     res.json({ success: true, message: 'Password has been successfully reset!' });
   } catch (err) {
