@@ -33,7 +33,7 @@ router.post('/reset-password-request', async (req, res) => {
       to: email,
       from: 'noreply@alexstore.com',
       subject: 'Password Reset',
-      text: `Hi! You got this letter because you want to reset the password for your account.\n\nPlease paste this link into your browser to complete the password change process:\n\nhttp://localhost:3000/auth/reset-password/${token}\n\`,
+      text: `Hi! You got this letter because you want to reset the password for your account.\n\nPlease paste this link into your browser to complete the password change process:\n\nhttp://localhost:3000/auth/reset-password/${token}\n\ `,
     };
 
     transporter.sendMail(mailOptions, (err) => {
