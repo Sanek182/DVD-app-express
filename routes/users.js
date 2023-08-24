@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/connection');
-const { generateToken } = require('./token');
+const { generateToken } = require('../crypto/token');
 const nodemailer = require('nodemailer');
 
 router.post('/reset-password-request', async (req, res) => {
@@ -76,20 +76,17 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await db.query('SELECT * FROM User WHERE username = ? AND password = ?', [username, password]);
-
+    const [rows] = await db.query('SELECT * FROM User WHERE username = ? AND password = ?', 
+      [username, password]);
     if (rows.length === 0) {
-      return res.status(401).json({ success: false, message: "Such user does not exist. Please check your username or password inputs once again."});
+      return res.status(401).json({ success: false, 
+        message: "User not found. Please check your username or password inputs once again."});
     }
 
     const user = rows[0];
-    
-    const { token, expiresAt } = generateToken("auth");
 
-    await db.query('INSERT INTO UserTokens (user_id, token, expires_at, token_type) VALUES (?, ?, ?, ?)', [user.id, token, expiresAt, "auth"]);
-
-    res.cookie('token', token, { httpOnly: true, expires: expiresAt });
-
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    res.cookie('userId', user.id, { signed: true, httpOnly: true, expires: expiresAt });
     res.json({ success: true, message: 'You have successfully logged in!' });
 
   } catch (err) {
