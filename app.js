@@ -1,10 +1,11 @@
+require('dotenv').config({ path: '.env' });
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const port = process.env.PORT || 3500;
 const cors = require('cors');
-const addCookieParser = require('./crypto/cookieParsing')
+const secretKey = process.env.COOKIE_KEY;
 const bodyParser = require('body-parser');
 
 var indexRouter = require('./routes/index');
@@ -21,7 +22,7 @@ app.use(logger('dev'));
 app.use(cors(corsWay));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(secretKey));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
@@ -32,7 +33,5 @@ app.use('/auth', usersRouter);
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
-addCookieParser(app);
 
 module.exports = app;
