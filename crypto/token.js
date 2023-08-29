@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const secretKey = process.env.TOKEN_KEY;
 
 function encode(data) {
     return Buffer.from(data).toString('base64');
@@ -13,7 +14,7 @@ function generateToken(userId) {
     const data = `${userId}-${timestamp}`;
     const encodedData = encode(data);
 
-    const hmac = crypto.createHmac('sha256', 'YourSecureSecretKey');
+    const hmac = crypto.createHmac('sha256', secretKey);
     hmac.update(encodedData);
     const hash = hmac.digest('hex');
 
