@@ -30,11 +30,11 @@ router.post('/reset-password-request', async (req, res) => {
 });
 
 router.post('/reset-password', async (req, res, next) => {
-  const { token, password } = req.body;
+  const { token, newPassword } = req.body;
   console.log('Token:', token);
-  console.log('Password:', password);
+  console.log('Password:', newPassword);
 
-  if (!password) {
+  if (!newPassword) {
     return res.status(400).json({ success: false, message: 'Password is required' });
   }
   
@@ -44,6 +44,7 @@ router.post('/reset-password', async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
     
+    req.body.password = newPassword;
     req.userId = userId;
     next();
   } catch (err) {
@@ -52,10 +53,9 @@ router.post('/reset-password', async (req, res, next) => {
   }
 }, hashPassword, async (req, res) => {
   const { hashedPass } = req;
-  const { userId } = req;
 
   try {
-    await db.query('UPDATE User SET password = ? WHERE id = ?', [hashedPass, userId]);
+    await db.query('UPDATE User SET password = ? WHERE id = ?', [hashedPass, req.userId]);
     res.json({ success: true, message: 'Password has been successfully reset!' });
   } catch (err) {
     console.error('Database Error:', err);
@@ -85,9 +85,28 @@ router.post('/login', async (req, res, next) => {
     res.status(500).send('Server error');
   }
 }, comparePassword, (req, res) => {
-  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-  res.cookie('userId', req.user.id, { signed: true, httpOnly: true, expires: expiresAt });
+  const userId = req.user.id;
+  const username = req.user.username;
+  
+  if (!req.session.user) {
+    req.session.user = {};
+  }
+
+  req.session.user.id = userId;
+  req.session.username = username;
+
   res.json({ success: true, message: 'You have successfully logged in!' });
+});
+
+
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send("Couldn't log you out.");
+    }
+    res.clearCookie('userId');
+    return res.status(200).send("Logged out");
+  });
 });
 
 router.post('/register', hashPassword, async (req, res) => {
