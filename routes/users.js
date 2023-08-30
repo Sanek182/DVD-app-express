@@ -73,7 +73,7 @@ router.post('/login', async (req, res, next) => {
     if (rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: "User not found. Please check your username input once again."
+        message: "User not found. Please check your username."
       });
     }
 
@@ -93,21 +93,22 @@ router.post('/login', async (req, res, next) => {
   }
 
   req.session.user.id = userId;
-  req.session.username = username;
+  req.session.user.username = username;
 
   res.json({ success: true, message: 'You have successfully logged in!' });
 });
 
 
+
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).send("Couldn't log you out.");
+      return res.status(500).json({ success: false, message: "Couldn't log you out." });
     }
-    res.clearCookie('userId');
-    return res.status(200).send("Logged out");
+    return res.status(200).json({ success: true, message: "Logged out" });
   });
 });
+
 
 router.post('/register', hashPassword, async (req, res) => {
   const { username, email } = req.body;
@@ -125,5 +126,12 @@ router.post('/register', hashPassword, async (req, res) => {
     res.status(500).send('Something went wrong. Registration failed.');
   }
 });
+
+function requireLogin(req, res, next) {
+  if (req.session && req.session.userId) {
+    return next();
+  }
+  res.status(401).send('Authorization required');
+}
 
 module.exports = router;
