@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const { hashPassword, comparePassword } = require('../service/passwordEncrypt')
 const db = require('../database/connection');
-const { generateToken, decodeUserIdFromToken, validateToken } = require('../crypto/token');
+const { generateToken, decodeUserIdFromToken, validateToken } = require('../identity-helpers/token');
 const { sendPasswordResetEmail } = require('../service/emailSend');
 
 router.post('/reset-password-request', async (req, res) => {
@@ -63,7 +63,6 @@ router.post('/reset-password', async (req, res, next) => {
   }
 });
 
-
 router.post('/login', async (req, res, next) => {
   const { username } = req.body;
 
@@ -97,8 +96,6 @@ router.post('/login', async (req, res, next) => {
 
   res.json({ success: true, message: 'You have successfully logged in!' });
 });
-
-
 
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
