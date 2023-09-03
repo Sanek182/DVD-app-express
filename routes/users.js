@@ -63,6 +63,14 @@ router.post('/reset-password', async (req, res, next) => {
   }
 });
 
+const setSession = (req, userId, username) => {
+  if (!req.session.user) {
+    req.session.user = {};
+  }
+  req.session.user.id = userId;
+  req.session.user.username = username;
+};
+
 router.post('/login', async (req, res, next) => {
   const { username } = req.body;
 
@@ -84,15 +92,7 @@ router.post('/login', async (req, res, next) => {
     res.status(500).send('Server error');
   }
 }, comparePassword, (req, res) => {
-  const userId = req.user.id;
-  const username = req.user.username;
-  
-  if (!req.session.user) {
-    req.session.user = {};
-  }
-
-  req.session.user.id = userId;
-  req.session.user.username = username;
+  setSession(req, req.user.id, req.user.username);
 
   res.json({ success: true, message: 'You have successfully logged in!' });
 });

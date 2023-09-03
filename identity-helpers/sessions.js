@@ -18,8 +18,4 @@ module.exports = (app) => {
         },
     }));
 
-    app.use((req, res, next) => {
-        req.session.cookie.maxAge = 1000 * 60 * 60; // 1 hour
-        next();
-    });
 };
