@@ -1,9 +1,11 @@
+require('dotenv').config({ path: '.env' });
+
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cors = require('cors');
 
-const port = process.env.PORT || 3500;
+const port = process.env.PORT;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,14 +24,6 @@ app.use(cors(corsOptions));
 // request parsing block
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-const authorizeUser = (req, res, next) => {
-    if (req.session && req.session.user && req.session.user.id) {
-        next();
-    } else {
-        res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-};
 
 app.use(express.static(path.join(__dirname, 'public')));
 
