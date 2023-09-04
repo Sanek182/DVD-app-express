@@ -124,6 +124,19 @@ router.post('/register', hashPassword, async (req, res) => {
   }
 });
 
+router.get('/checkAuth', (req, res) => {
+  if (req.session && req.session.user) {
+    res.json({
+      isAuthenticated: true,
+      username: req.session.user.username,
+    });
+  } else {
+    res.json({
+      isAuthenticated: false,
+    });
+  }
+});
+
 function requireLogin(req, res, next) {
   if (req.session && req.session.userId) {
     return next();
