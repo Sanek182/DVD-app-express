@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const { hashPassword, comparePassword } = require('../service/passwordEncrypt')
-const db = require('../database/connection');
-const { generateToken, decodeUserIdFromToken, validateToken } = require('../identity-helpers/token');
-const { sendPasswordResetEmail } = require('../service/emailSend');
+const { hashPassword, comparePassword } = require('../../service/passwordEncrypt')
+const db = require('../../database/connection');
+const { generateToken, decodeUserIdFromToken, validateToken } = require('../../identity-helpers/token');
+const { sendPasswordResetEmail } = require('../../service/emailSend');
 
 router.post('/reset-password-request', async (req, res) => {
   const { email } = req.body;
