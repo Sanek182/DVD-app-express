@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const { hashPassword, comparePassword } = require('../service/passwordEncrypt')
-const db = require('../database/connection');
-const { generateToken, decodeUserIdFromToken, validateToken } = require('../identity-helpers/token');
-const { sendPasswordResetEmail } = require('../service/emailSend');
+const { hashPassword, comparePassword } = require('../../service/passwordEncrypt')
+const db = require('../../database/connection');
+const { generateToken, decodeUserIdFromToken, validateToken } = require('../../identity-helpers/token');
+const { sendPasswordResetEmail } = require('../../service/emailSend');
 
 router.post('/reset-password-request', async (req, res) => {
   const { email } = req.body;
@@ -145,21 +145,3 @@ function requireLogin(req, res, next) {
 }
 
 module.exports = router;
-
-
-/*
-
-middleware - auth = (req, res, next) => {
-  // check if user is authenticated
-  //  if not - responsd with 401 error (Not authorized)
-  //  if yes - call next
-}
-
- router.get('/my-orders', auth, (req, res) => {  
-  get user's orders and return them
- })
-
- router.post('/add-wish-list', auth, (req, res) => {  
-  add this item to users's wishlist
- })
-*/
