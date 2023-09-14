@@ -16,6 +16,7 @@ async function hashPassword(req, res, next) {
 async function comparePassword(req, res, next) {
     try {
       const { password } = req.body;
+      console.log(req.user);
       const userPassword = req.user.password;
       const isMatch = await bcrypt.compare(password, userPassword);
   

@@ -15,6 +15,7 @@ function generateToken(userId) {
     const timestamp = Date.now();
     const expiryTime = Date.now() + tokenLifetime;
     const data = `${userId} - ${timestamp} - ${expiryTime}`;
+    console.log('The data when generating is:' + data);
     const encodedData = encode(data);
 
     const hmac = crypto.createHmac('sha256', secretKey);
@@ -28,7 +29,8 @@ function generateToken(userId) {
 function decodeUserIdFromToken(token) {
     const [hash, encodedData] = token.split('-');
     const decodedData = decode(encodedData);
-    const [userId, timestamp, expiryTime] = decodedData.split('-');
+    const [userId, timestamp, expiryTimeStr] = decodedData.split('-').map(s => s.trim());
+    const expiryTime = Number(expiryTimeStr);
   
     return { userId, timestamp, expiryTime, hash };
 }
@@ -36,14 +38,25 @@ function decodeUserIdFromToken(token) {
 function validateToken(token, userId) {
     const { userId: decodedUserId, timestamp, expiryTime, hash } = decodeUserIdFromToken(token);
   
-    if (userId !== decodedUserId || Date.now() > expiryTime) {
+    if (String(userId) !== String(decodedUserId)) {
+        console.log('Token userId mismatch:', userId, decodedUserId);
+        return false;
+    }
+
+    if (Date.now() > expiryTime) {
+        console.log('Token has expired');
         return false;
     }
 
     const data = encode(`${userId} - ${timestamp} - ${expiryTime}`);
+    console.log('The data when validating is:' + data);
     const hmac = crypto.createHmac('sha256', secretKey);
     hmac.update(data);
     const expectedHash = hmac.digest('hex');
+
+    if (expectedHash !== hash) {
+        console.log('Hash mismatch:', expectedHash, hash);
+    }
   
     return expectedHash === hash;
 }
