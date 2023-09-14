@@ -10,6 +10,8 @@ const port = process.env.PORT;
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/manipulateUsers/users');
 
+const setupSessions = require('./identity-helpers/sessions');
+
 var app = express();
 
 const corsOptions = {
@@ -27,6 +29,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+setupSessions(app);
 
 app.use('/', indexRouter);
 app.use('/auth', usersRouter);

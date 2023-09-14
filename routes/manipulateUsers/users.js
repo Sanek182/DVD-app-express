@@ -76,6 +76,7 @@ router.post('/login', async (req, res, next) => {
 
   try {
     const [rows] = await db.query('SELECT * FROM User WHERE username = ?', [username]);
+    console.log("Fetched user data:", rows);
   
     if (rows.length === 0) {
       return res.status(401).json({
@@ -85,6 +86,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     req.user = rows[0];
+    console.log("req.user after assignment:", req.user);
     next();
 
   } catch (err) {
