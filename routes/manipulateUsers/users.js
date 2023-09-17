@@ -5,7 +5,29 @@ const db = require('../../database/connection');
 const { generateToken, decodeUserIdFromToken, validateToken } = require('../../identity-helpers/token');
 const { sendPasswordResetEmail } = require('../../service/emailSend');
 
+const rateLimit = {
+  count: 0,
+  timestamp: null
+};
+
+const rateLimitResetTime = 3600000;
+const maxTries = 3;
+
 router.post('/reset-password-request', async (req, res) => {
+  const currentTime = Date.now();
+
+  if (rateLimit.count >= maxTries) {
+    const timePassed = currentTime - rateLimit.timestamp;
+    if (timePassed < rateLimitResetTime) {
+      return res.status(429).json({
+        success: false,
+        message: 'You have exceeded the maximum number of password reset attempts. Please try again later.'
+      });
+    } else {
+      rateLimit.count = 0;
+    }
+  }
+  
   const { email } = req.body;
   console.log(req.body);
 
@@ -27,6 +49,9 @@ router.post('/reset-password-request', async (req, res) => {
     console.error(err);
     res.status(500).send('Server error');
   }
+  
+  rateLimit.count += 1;
+  rateLimit.timestamp = currentTime;
 });
 
 router.post('/reset-password', async (req, res, next) => {
@@ -37,20 +62,16 @@ router.post('/reset-password', async (req, res, next) => {
   if (!newPassword) {
     return res.status(400).json({ success: false, message: 'Password is required' });
   }
+
+  const decoded = decodeUserIdFromToken(token);
   
-  try {
-    const { userId } = decodeUserIdFromToken(token);
-    if (!validateToken(token, userId)) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
-    }
-    
-    req.body.password = newPassword;
-    req.userId = userId;
-    next();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
+  if (!validateToken(token, decoded.userId)) {
+    return res.status(400).json({ success: false, message: 'Invalid or expired token' });
   }
+    
+  req.body.password = newPassword;
+  req.userId = userId;
+  next();
 }, hashPassword, async (req, res) => {
   const { hashedPass } = req;
 
