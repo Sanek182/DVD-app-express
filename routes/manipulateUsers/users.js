@@ -70,7 +70,7 @@ router.post('/reset-password', async (req, res, next) => {
   }
     
   req.body.password = newPassword;
-  req.userId = userId;
+  req.userId = decoded.userId;
   next();
 }, hashPassword, async (req, res) => {
   const { hashedPass } = req;
@@ -123,8 +123,10 @@ router.post('/login', async (req, res, next) => {
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
+      console.error("Error during session destroy:", err);
       return res.status(500).json({ success: false, message: "Couldn't log you out." });
     }
+    console.log("Session destroyed");
     return res.status(200).json({ success: true, message: "Logged out" });
   });
 });
