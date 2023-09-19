@@ -18,23 +18,32 @@ router.get('/api/latest-dvds', async (req, res) => {
 
 router.get('/api/all-dvds', async (req, res) => {
   try {
-    let query = 'SELECT * FROM Product';
+    let query = 
+      `SELECT P.* FROM Product P
+      LEFT JOIN Movie_Genres MG ON P.id = MG.dvd_id
+      LEFT JOIN Genre G ON MG.genre_id = G.id`
+    ;    
     const params = [];
     
-    if (req.query.genre) {
-      query += ' WHERE genre_name = ?';
+    if (req.query.genre && req.query.genre !== 'All') {
+      query += ' WHERE G.genre_name = ?';
       params.push(req.query.genre);
     }
-    if (req.query.decade) {
-      query += req.query.genre ? ' AND ' : ' WHERE ';
-      query += 'YEAR(year_produced) BETWEEN ? AND ?';
-      params.push(req.query.decade, parseInt(req.query.decade) + 9);
+    
+    if (req.query.decade && req.query.decade !== 'All') {
+      query += req.query.genre && req.query.genre !== 'All' ? ' AND ' : ' WHERE ';
+      query += "P.year_produced BETWEEN ? AND ?";
+      params.push(`${req.query.decade}-01-01`, `${parseInt(req.query.decade) + 9}-12-31`);
     }
-    if (req.query.country) {
-      query += (req.query.genre || req.query.decade) ? ' AND ' : ' WHERE ';
-      query += 'movie_country = ?';
+       
+    if (req.query.country && req.query.country !== 'All') {
+      query += (req.query.genre && req.query.genre !== 'All' || req.query.decade && req.query.decade !== 'All') ? ' AND ' : ' WHERE ';
+      query += 'P.movie_country = ?';
       params.push(req.query.country);
     }
+
+    query += ' GROUP BY P.id';
+
     const [rows] = await db.query(query, params);
     res.status(200).json(rows);
   } catch (error) {
@@ -72,5 +81,28 @@ router.get('/api/dvd/:id', async (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+router.get('/api/dvds/search', async (req, res) => {
+  try {
+    const searchQuery = req.query.query;
+    const query =
+      `SELECT P.* FROM Product P
+      WHERE P.movie_title LIKE ? OR P.original_title LIKE ?`;
+    
+    const param = `%${searchQuery}%`;
+
+    const [rows] = await db.query(query, [param, param]);
+    
+    if (rows.length > 0) {
+      res.status(200).json(rows);
+    } else {
+      res.status(404).json({ message: 'No DVDs found' });
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 
 module.exports = router;
