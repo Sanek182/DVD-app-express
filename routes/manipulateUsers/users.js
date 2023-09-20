@@ -4,6 +4,7 @@ const { hashPassword, comparePassword } = require('../../service/passwordEncrypt
 const db = require('../../database/connection');
 const { generateToken, decodeUserIdFromToken, validateToken } = require('../../identity-helpers/token');
 const { sendPasswordResetEmail } = require('../../service/emailSend');
+const { isUserAuthenticated } = require('../../checks/authState')
 
 const rateLimit = {
   count: 0,
@@ -159,6 +160,20 @@ router.get('/checkAuth', (req, res) => {
     res.json({
       isAuthenticated: false,
     });
+  }
+});
+
+router.put('/update-user', isUserAuthenticated, async (req, res) => {
+  const { first_name, last_name, country_resid, birth_date, phone_num } = req.body;
+
+  const userId = req.session.user.id;
+
+  try {
+    await db.query('UPDATE User SET first_name = ?, last_name = ?, country_resid = ?, birth_date = ?, phone_num = ? WHERE id = ?', [first_name, last_name, country_resid, birth_date, phone_num, userId]);
+    res.json({ success: true, message: 'User details updated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 

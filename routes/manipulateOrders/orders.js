@@ -189,4 +189,31 @@ router.delete('/api/delete-cart-item', isUserAuthenticated, async (req, res) => 
   }
 });
 
+router.post('/create-order', isUserAuthenticated, async (req, res) => {
+  const { userId, cartId, specificDetails, addExpenses, totalSum } = req.body;
+
+  try {
+    const [order] = await db.query(
+      'INSERT INTO `Order` (user_id, cart_id, created_at, specific_details, add_expenses, total_sum) VALUES (?, ?, NOW(), ?, ?, ?)',
+      [userId, cartId, specificDetails, addExpenses, totalSum]
+    );
+    const orderId = order.insertId;
+
+    const [cartItems] = await db.query('SELECT * FROM Cart_Item WHERE cart_id = ?', [cartId]);
+
+    for (const item of cartItems) {
+      await db.query(
+        'INSERT INTO Order_Item (order_id, dvd_id, price, quantity) VALUES (?, ?, ?, ?)',
+        [orderId, item.dvd_id, item.price, item.quantity]
+      );
+    }
+
+    res.status(200).json({ success: true, message: 'Order created' });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+
 module.exports = router;
