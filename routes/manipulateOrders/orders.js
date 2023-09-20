@@ -189,13 +189,13 @@ router.delete('/api/delete-cart-item', isUserAuthenticated, async (req, res) => 
   }
 });
 
-router.post('/create-order', isUserAuthenticated, async (req, res) => {
+router.post('/api/create-order', isUserAuthenticated, async (req, res) => {
   const { userId, cartId, specificDetails, addExpenses, totalSum } = req.body;
 
   try {
     const [order] = await db.query(
       'INSERT INTO `Order` (user_id, cart_id, created_at, specific_details, add_expenses, total_sum) VALUES (?, ?, NOW(), ?, ?, ?)',
-      [userId, cartId, specificDetails, addExpenses, totalSum]
+      [Number(userId), Number(cartId), specificDetails, Number(addExpenses), parseFloat(totalSum)]
     );
     const orderId = order.insertId;
 
@@ -212,6 +212,32 @@ router.post('/create-order', isUserAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+router.get('/api/initial-state', isUserAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+
+    const [cartRows] = await db.query('SELECT id FROM Cart WHERE user_id = ?', [userId]);
+    const cartId = cartRows.length > 0 ? cartRows[0].id : null;
+
+    const [sumRows] = await db.query(`
+      SELECT SUM(Product.price * Cart_Item.quantity) as total_sum 
+      FROM Cart_Item 
+      JOIN Product ON Cart_Item.dvd_id = Product.id
+      WHERE Cart_Item.cart_id = ?`, [cartId]
+    );
+    const totalSum = sumRows.length > 0 ? sumRows[0].total_sum : 0;
+
+    res.status(200).json({
+      userId,
+      cartId,
+      totalSum
+    });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
