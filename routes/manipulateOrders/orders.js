@@ -191,16 +191,17 @@ router.delete('/api/delete-cart-item', isUserAuthenticated, async (req, res) => 
 
 router.post('/api/create-order', isUserAuthenticated, async (req, res) => {
   const { userId, cartId, specificDetails, addExpenses, totalSum } = req.body;
-
+  
   try {
     const [order] = await db.query(
       'INSERT INTO `Order` (user_id, cart_id, created_at, specific_details, add_expenses, total_sum) VALUES (?, ?, NOW(), ?, ?, ?)',
       [Number(userId), Number(cartId), specificDetails, Number(addExpenses), parseFloat(totalSum)]
     );
+    
     const orderId = order.insertId;
 
-    const [cartItems] = await db.query('SELECT * FROM Cart_Item WHERE cart_id = ?', [cartId]);
-
+    const [cartItems] = await db.query('SELECT Cart_Item.*, Product.price FROM Cart_Item JOIN Product ON Cart_Item.dvd_id = Product.id WHERE Cart_Item.cart_id = ?', [cartId]);
+    
     for (const item of cartItems) {
       await db.query(
         'INSERT INTO Order_Item (order_id, dvd_id, price, quantity) VALUES (?, ?, ?, ?)',
@@ -241,5 +242,40 @@ router.get('/api/initial-state', isUserAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/api/order-items', isUserAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const query = "SELECT Product.movie_title, Product.product_type, Order_Item.quantity, Order_Item.price, Product.stock_quantity FROM Order_Item JOIN `Order` ON Order_Item.order_id = `Order`.id JOIN Product ON Order_Item.dvd_id = Product.id WHERE `Order`.user_id = ?";
+    
+    const [rows] = await db.query(query, [userId]);
+
+    console.log("Rows returned from query: ", rows);
+
+    rows.forEach(row => {
+      if (typeof row.price === 'string') {
+        row.price = parseFloat(row.price);
+      }
+    });
+
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+router.post('/api/create-shipment', isUserAuthenticated, async (req, res) => {
+  try {
+    const { userId, orderId, trackingNum, shipDays, status } = req.body;
+
+    // Perform SQL Insert operation to create shipment
+    // ...
+
+    res.status(200).json({ success: true, message: 'Shipment created successfully.' });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 
 module.exports = router;
