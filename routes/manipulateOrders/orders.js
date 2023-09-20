@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../../database/connection');
+const { isUserAuthenticated } = require('../../checks/authState')
 
 router.get('/api/latest-dvds', async (req, res) => {
   try {
@@ -104,5 +105,88 @@ router.get('/api/dvds/search', async (req, res) => {
   }
 });
 
+router.get('/api/cart-items', isUserAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+
+    const query = `
+      SELECT 
+        Cart.id as cart_id, 
+        Cart_Item.id as cart_item_id, 
+        Product.id as dvd_id, 
+        Product.price, 
+        Product.product_type, 
+        Product.stock_quantity, 
+        Product.movie_title,
+        Cart_Item.quantity,
+        Cart_Item.added_at
+      FROM Cart
+      JOIN Cart_Item ON Cart.id = Cart_Item.cart_id
+      JOIN Product ON Cart_Item.dvd_id = Product.id
+      WHERE Cart.user_id = ?;
+    `;
+
+    const [rows] = await db.query(query, [userId]);
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+router.post('/api/add-to-cart', isUserAuthenticated, async (req, res) => {
+  const { dvdId } = req.body;
+  const userId = req.session.user.id;
+
+  try {
+    let [existingCart] = await db.query(
+      'SELECT id FROM Cart WHERE user_id = ?',
+      [userId]
+    );
+    
+    let cartId;
+    if (existingCart.length === 0) {
+      const [newCart] = await db.query(
+        'INSERT INTO Cart (user_id, created_at, updated_at) VALUES (?, NOW(), NOW())',
+        [userId]
+      );
+      cartId = newCart.insertId;
+    } else {
+      cartId = existingCart[0].id;
+    }
+    
+    await db.query(
+      'INSERT INTO Cart_Item (cart_id, dvd_id, added_at, quantity) VALUES (?, ?, NOW(), ?)',
+      [cartId, dvdId, 1]
+    );
+    
+    res.status(200).json({ success: true, message: 'DVD added to cart' });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+router.put('/api/update-cart-item', isUserAuthenticated, async (req, res) => {
+  const { cartItemId, newQuantity } = req.body;
+  try {
+    await db.query('UPDATE Cart_Item SET quantity = ? WHERE id = ?', [newQuantity, cartItemId]);
+    res.status(200).json({ success: true, message: 'Cart item updated' });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+router.delete('/api/delete-cart-item', isUserAuthenticated, async (req, res) => {
+  const { cartItemId } = req.body;
+  try {
+    await db.query('DELETE FROM Cart_Item WHERE id = ?', [cartItemId]);
+    res.status(200).json({ success: true, message: 'Cart item deleted' });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 
 module.exports = router;

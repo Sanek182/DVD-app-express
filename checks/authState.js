@@ -4,5 +4,6 @@ const isUserAuthenticated = (req, res, next) => {
     } else {
       res.status(401).json({ success: false, message: "Unauthorized" });
     }
-  };
-  
+};
+
+module.exports = { isUserAuthenticated };
