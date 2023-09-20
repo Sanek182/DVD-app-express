@@ -231,10 +231,14 @@ router.get('/api/initial-state', isUserAuthenticated, async (req, res) => {
     );
     const totalSum = sumRows.length > 0 ? sumRows[0].total_sum : 0;
 
+    const [orderRows] = await db.query('SELECT id FROM `Order` WHERE user_id = ? ORDER BY created_at DESC LIMIT 1', [userId]);
+    const orderId = orderRows.length > 0 ? orderRows[0].id : null;
+
     res.status(200).json({
       userId,
       cartId,
-      totalSum
+      totalSum,
+      orderId
     });
   } catch (error) {
     console.error('An error occurred:', error);
@@ -268,13 +272,98 @@ router.post('/api/create-shipment', isUserAuthenticated, async (req, res) => {
   try {
     const { userId, orderId, trackingNum, shipDays, status } = req.body;
 
-    // Perform SQL Insert operation to create shipment
-    // ...
+    const [shipment] = await db.query(
+      'INSERT INTO `Shipment` (user_id, order_id, created_at, status, tracking_num, ship_days) VALUES (?, ?, NOW(), ?, ?, ?)',
+      [Number(userId), Number(orderId), status, trackingNum, Number(shipDays)]
+    );
 
-    res.status(200).json({ success: true, message: 'Shipment created successfully.' });
+    if (shipment.affectedRows > 0) {
+      res.status(200).json({ success: true, message: 'Shipment created successfully.' });
+    } else {
+      res.status(400).json({ success: false, message: 'Shipment could not be created.' });
+    }
+
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+router.get('/api/receipt-info/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const query = `
+      SELECT 
+        User.first_name,
+        User.last_name,
+        User.country_resid,
+        Shipment.ship_days,
+        Shipment.tracking_num
+      FROM User
+      JOIN \`Order\` ON User.id = \`Order\`.user_id
+      JOIN Shipment ON \`Order\`.id = Shipment.order_id
+      WHERE \`Order\`.id = ?;
+    `;
+
+    const [rows] = await db.query(query, [orderId]);
+
+    if (rows.length > 0) {
+      const row = rows[0];
+      const userInfo = {
+        firstName: row.first_name,
+        lastName: row.last_name,
+        country: row.country_resid,
+      };
+      const shipmentInfo = {
+        days: row.ship_days,
+        trackingNum: row.tracking_num,
+      };
+
+      res.status(200).json({
+        userInfo,
+        shipmentInfo,
+      });
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+module.exports = router;
+
+router.post('/api/cancel-shipment', isUserAuthenticated, async (req, res) => {
+  const { orderId } = req.body;
+
+  try {
+    await db.query('START TRANSACTION');
+
+    await db.query('DELETE FROM Shipment WHERE order_id = ?', [orderId]);
+
+    const [rows] = await db.query('SELECT cart_id FROM `Order` WHERE id = ?', [orderId]);
+    if (rows.length === 0) {
+      throw new Error("Order not found");
+    }
+    const cartId = rows[0].cart_id;
+
+    await db.query('DELETE FROM Order_Item WHERE order_id = ?', [orderId]);
+
+    await db.query('DELETE FROM `Order` WHERE id = ?', [orderId]);
+
+    await db.query('DELETE FROM Cart_Item WHERE cart_id = ?', [cartId]);
+
+    await db.query('DELETE FROM Cart WHERE cart_id = ?', [cartId]);
+
+    await db.query('COMMIT');
+
+    res.status(200).json({ success: true, message: "Shipment and associated records deleted successfully" });
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
