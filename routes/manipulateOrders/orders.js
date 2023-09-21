@@ -249,7 +249,7 @@ router.get('/api/initial-state', isUserAuthenticated, async (req, res) => {
 router.get('/api/order-items', isUserAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const query = "SELECT Product.movie_title, Product.product_type, Order_Item.quantity, Order_Item.price, Product.stock_quantity FROM Order_Item JOIN `Order` ON Order_Item.order_id = `Order`.id JOIN Product ON Order_Item.dvd_id = Product.id WHERE `Order`.user_id = ?";
+    const query = "SELECT Product.movie_title, Product.product_type, Order_Item.quantity, Order_Item.price, Product.stock_quantity, Order.created_at FROM Order_Item JOIN `Order` ON Order_Item.order_id = `Order`.id JOIN Product ON Order_Item.dvd_id = Product.id WHERE `Order`.user_id = ?";
     
     const [rows] = await db.query(query, [userId]);
 
